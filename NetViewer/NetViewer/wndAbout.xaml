@@ -1,0 +1,51 @@
+﻿<Window x:Class="wndAbout"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NetViewer"
+        mc:Ignorable="d"
+        Title="NetViewer" 
+        MinWidth="550"
+        MinHeight="390"
+        Width="550"
+        Height="420"
+        Background="{DynamicResource ColorElementBackground}"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}" WindowStartupLocation="CenterOwner" Icon="img/app.ico">
+    <Grid>
+        <DockPanel LastChildFill="True" Margin="5">
+            <DockPanel>
+                <Grid>
+                    <Image Source="img/about.png" Height="325"/>
+                    <!--<Label Content="WPF" FontSize="18" FontWeight="ExtraLight" RenderTransformOrigin="0.5,0.5" Margin="49,5,61,260">
+                        <Label.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform Angle="-45"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Label.RenderTransform>
+                    </Label>-->
+                </Grid>
+            </DockPanel>
+            <DockPanel LastChildFill="True">
+                <StackPanel DockPanel.Dock="Top">
+                    <TextBlock Text="NetViewer" FontSize="18" FontWeight="Bold" Margin="0,15,0,0"/>
+                    <TextBlock Text="{Binding Version, Mode=OneWay}" FontSize="16" Margin="0,15,0,0"/>
+                    <TextBlock Text="{Binding Company, Mode=OneWay}" FontSize="16" Margin="0,15,0,0"/>
+                    <TextBlock Text="{Binding Copyright, Mode=OneWay}" FontSize="16" Margin="0,15,0,0"/>
+                    <TextBlock Text="История изменений:" Margin="0,15,0,5" />
+                </StackPanel>
+                <Border BorderThickness="1" BorderBrush="{DynamicResource ColorButtonBackground}" >
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <TextBlock TextWrapping="Wrap">
+                            <LineBreak/> *** 1.0 *** <LineBreak/>
+                            - WPF-версия <LineBreak/>
+                        </TextBlock>
+                    </ScrollViewer>
+                </Border>
+            </DockPanel>
+        </DockPanel>
+    </Grid>
+</Window>

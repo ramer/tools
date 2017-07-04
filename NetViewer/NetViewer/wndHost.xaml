@@ -1,0 +1,66 @@
+﻿<Window x:Class="wndHost"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
+        xmlns:local="clr-namespace:NetViewer"
+        mc:Ignorable="d"
+        Title="Хост" Height="467" Width="674.343" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Icon="img/app.ico">
+
+    <Grid>
+        <TabControl x:Name="tabctlHost" Margin="5">
+            <TabItem Header="Основные сведения">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <DockPanel>
+                        <StackPanel Margin="5,5,0,0">
+                            <Border Width="150" Height="150" BorderThickness="0" Margin="0,0,0,5">
+                                <Image Width="120" Height="120" Source="{Binding Image}"/>
+                            </Border>
+                            <ComboBox x:Name="cmboType" SelectedValuePath="Key" DisplayMemberPath="Value" SelectedValue="{Binding Type}" />
+                        </StackPanel>
+                        <StackPanel>
+                            <DockPanel LastChildFill="True" Margin="5,5,5,0">
+                                <TextBlock Text="Описание" Width="200"/>
+                                <TextBox Name="tbDescription" Height="23" Text="{Binding Description}" MaxLength="1024"/>
+                            </DockPanel>
+                            <DockPanel LastChildFill="True" Margin="5,5,5,0">
+                                <TextBlock Text="Имя хоста" Width="200"/>
+                                <Button x:Name="btnUpdateHostname" DockPanel.Dock="right" Content="🔎" Height="23" Width="23"/>
+                                <TextBox x:Name="tbHostname" Height="23" Text="{Binding Hostname}" MaxLength="256"/>
+                            </DockPanel>
+                            <DockPanel LastChildFill="True" Margin="5,5,5,0">
+                                <TextBlock Text="IP адрес (:порт)" Width="200"/>
+                                <Button x:Name="btnUpdateIPAddress" DockPanel.Dock="right" Content="🔎" Height="23" Width="23"/>
+                                <TextBox x:Name="tbIPAddress" Height="23" Text="{Binding IPAddress}" MaxLength="46"/>
+                            </DockPanel>
+                            <DockPanel LastChildFill="True" Margin="5,5,5,0">
+                                <TextBlock Text="MAC адрес" Width="200"/>
+                                <Button x:Name="btnUpdateMACAddress" DockPanel.Dock="right" Content="🔎" Height="23" Width="23"/>
+                                <TextBox x:Name="tbMACAddress" Height="23" Text="{Binding MACAddress, Mode=OneWay}" IsReadOnly="True" MaxLength="20"/>
+                            </DockPanel>
+                            <DockPanel LastChildFill="True" Margin="5,5,5,0">
+                                <TextBlock Text="Интервал обновления (сек.):" Width="200"/>
+                                <DockPanel Width="200">
+                                    <Button x:Name="btnUpdateIntervalDecrease" DockPanel.Dock="Left" Content="➖" Height="23" Width="23"/>
+                                    <Button x:Name="btnUpdateIntervalIncrease" DockPanel.Dock="Right" Content="➕" Height="23" Width="23"/>
+                                    <TextBox Name="tbUpdateInterval" Height="23" Text="{Binding UpdateInterval}" TextAlignment="Center" MaxLength="5"/>
+                                </DockPanel>
+                            </DockPanel>
+                            <DockPanel LastChildFill="True" Margin="5,5,5,0">
+                                <TextBlock Text="Приоритет" Width="200"/>
+                                <ComboBox x:Name="cmboPingPriority" SelectedValuePath="Key" DisplayMemberPath="Value" SelectedValue="{Binding PingPriority}" />
+                            </DockPanel>
+                            <DockPanel LastChildFill="True" Margin="5,50,5,0">
+                                <TextBlock Text="Местонахождение" Width="200"/>
+                                <TextBox Name="tbLocation" Height="23" Text="{Binding Location}" MaxLength="1024"/>
+                            </DockPanel>
+
+                        </StackPanel>
+                    </DockPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>

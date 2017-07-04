@@ -1,0 +1,386 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
+        xmlns:local="clr-namespace:NetViewer"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        x:Class="wndMain"
+        mc:Ignorable="d"
+        Title="NetViewer" Height="793.879" Width="1363.293" Icon="img/app.ico" WindowState="Maximized"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    >
+    
+    <Window.Resources>
+        <CollectionViewSource x:Key="hosts_ro" />
+        <CollectionViewSource x:Key="hosts_rw" />
+        <CollectionViewSource x:Key="hosts_scaner" />
+    </Window.Resources>
+    
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <DockPanel DockPanel.Dock="Top" Background="{DynamicResource ColorMenuBackground}" LastChildFill="True">
+                <Button x:Name="btnDummy" DockPanel.Dock="Right" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,5,5,0" Content="߹" ToolTip="Тестовая кнопка (не тыкать)" Visibility="Visible"/>
+                <Menu>
+                    <MenuItem x:Name="mnuFile" Header="Файл">
+                        <MenuItem x:Name="mnuFileExit" Header="Выход"/>
+                    </MenuItem>
+                    <MenuItem x:Name="mnuService" Header="Сервис">
+                        <MenuItem x:Name="mnuServicePreferences" Header="Настройки приложения"/>
+                        <Separator/>
+                        <MenuItem x:Name="mnuServiceError" Header="Журнал ошибок"/>
+                    </MenuItem>
+                    <MenuItem x:Name="mnuHelp" Header="Справка">
+                        <MenuItem x:Name="mnuHelpAbout" Header="О программе"/>
+                    </MenuItem>
+                </Menu>
+            </DockPanel>
+            <TabControl TabStripPlacement="Left" SnapsToDevicePixels="True">
+                <TabItem Header="Хосты" Style="{DynamicResource TabItemVertical}" Margin="-2,0,2,0">
+
+                    <DockPanel LastChildFill="True">
+                        
+                        <StatusBar Height="24" DockPanel.Dock="Bottom" >
+                            <TextBlock><Run Text="Объектов: "/><Run Text="{Binding ElementName=dgHosts, Path=Items.Count, Mode=OneWay}"/></TextBlock>
+                            <TextBlock><Run Text="Выделено: "/><Run Text="{Binding ElementName=dgHosts, Path=SelectedItems.Count, Mode=OneWay}"/></TextBlock>
+                        </StatusBar>
+                        
+                        <DataGrid 
+                            x:Name="dgHosts"
+
+                            ItemsSource="{Binding Source={StaticResource ResourceKey=hosts_rw}}"
+                            IsReadOnly="False"
+                            CanUserAddRows="True"
+                            
+                            Foreground="Black"
+                            AlternationCount="2"
+                            VirtualizingPanel.IsVirtualizing="True"
+                            VirtualizingPanel.VirtualizationMode="Recycling"
+                            AutoGenerateColumns="False"
+                            GridLinesVisibility="None"
+                            IsSynchronizedWithCurrentItem="True"
+                        >
+
+                            <DataGrid.ContextMenu>
+                                <ContextMenu x:Name="ctxmnuHosts">
+                                    <MenuItem x:Name="ctxmnuHostsExternalSoftware" Header="Внешние приложения"/>
+                                    <MenuItem x:Name="ctxmnuHostsCopy" Header="Копировать">
+                                        <MenuItem x:Name="ctxmnuHostsCopyBasicAttributes" Header="Основные атрибуты" ToolTip="Имя хоста, IP адрес, MAC адрес"/>
+                                    </MenuItem>
+                                    <MenuItem x:Name="ctxmnuHostsRequest" Header="Запросить">
+                                        <MenuItem x:Name="ctxmnuHostsRequestIPAddress" Header="IP адрес по имени хоста"/>
+                                        <MenuItem x:Name="ctxmnuHostsRequestHostname" Header="Имя хоста по IP адресу"/>
+                                        <MenuItem x:Name="ctxmnuHostsRequestMACAddress" Header="MAC адрес по IP адресу (ARP)"/>
+                                    </MenuItem>
+                                    <MenuItem x:Name="ctxmnuHostsSelectAll" Header="Выделить все"/>
+                                    <Separator/>
+                                    <MenuItem x:Name="ctxmnuHostsRemove" Header="Удалить"/>
+                                    <MenuItem x:Name="ctxmnuHostsHistoryClear" Header="Очистить историю"/>
+                                    <Separator/>
+                                    <MenuItem x:Name="ctxmnuProperties" Header="Свойства..." FontWeight="Bold"/>
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
+
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="⬕" Width="72">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Height="64" Width="64" Source="{Binding Image, Mode=OneWay}" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,10,5"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                
+                                <DataGridTextColumn Binding="{Binding Description}" Header="Описание"  Width="150" SortMemberPath="Description" CanUserSort="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                
+                                <DataGridTextColumn Binding="{Binding Hostname}" Header="Имя хоста"  Width="300" SortMemberPath="Hostname" CanUserSort="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding PingPriority, Mode=OneWay}" Value="hostname">
+                                                    <Setter Property="FontWeight" Value="Bold"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Binding="{Binding IPAddress}" Header="IP адрес"  Width="150" SortMemberPath="IPAddress" CanUserSort="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding PingPriority, Mode=OneWay}" Value="ipaddress">
+                                                    <Setter Property="FontWeight" Value="Bold"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTemplateColumn Header="MAC адрес" Width="200" SortMemberPath="MACAddress" CanUserSort="True">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <DockPanel LastChildFill="True">
+                                                <TextBlock Text="{Binding MACAddress, Mode=OneWay}" VerticalAlignment="Center" />
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Header="Статус" Width="250" SortMemberPath="Status" CanUserSort="True">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Status, Mode=OneWay}" VerticalAlignment="Center" FontWeight="Bold"/>
+                                                <TextBlock Text="{Binding UpdateInterval, StringFormat=Интервал обновления: {0} сек.}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Header="Время отклика" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <DockPanel LastChildFill="True">
+                                                <oxy:PlotView Model="{Binding RealTimeModel}" Background="Transparent"/>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                            </DataGrid.Columns>
+                            
+                        </DataGrid>
+
+                    </DockPanel>
+                    
+                </TabItem>
+                <TabItem Header="Поиск" Style="{DynamicResource TabItemVertical}">
+
+                    <DockPanel LastChildFill="True">
+                        
+                        <StatusBar Height="24" DockPanel.Dock="Bottom" >
+                            <TextBlock><Run Text="Объектов: "/><Run Text="{Binding ElementName=dgScaner, Path=Items.Count, Mode=OneWay}"/></TextBlock>
+                            <TextBlock><Run Text="Выделено: "/><Run Text="{Binding ElementName=dgScaner, Path=SelectedItems.Count, Mode=OneWay}"/></TextBlock>
+                            <StatusBarItem HorizontalAlignment="Right">
+                                <StackPanel Orientation="Horizontal">
+                                    <ProgressBar x:Name="pbScaner" Width="30" Height="24" Margin="0" IsIndeterminate="True" Visibility="Hidden"/>
+                                </StackPanel>
+                            </StatusBarItem>
+                        </StatusBar>
+
+                        <StackPanel DockPanel.Dock="Bottom" Margin="0,5,0,0">
+                            <TextBlock Text="Введите адрес сети, диапазон, или IP адрес через запятую"/>
+                            <TextBox x:Name="tbScanerRange" Height="24"/>
+                        </StackPanel>
+
+                        <Grid>
+                            <local:ctlCap x:Name="cap" Panel.ZIndex="1" Visibility="Hidden"/>
+                            <DataGrid 
+                                    x:Name="dgScaner"
+                                
+                                    ItemsSource="{Binding Source={StaticResource ResourceKey=hosts_scaner}}"
+                                
+                                    Foreground="Black"
+                                    AlternationCount="2"
+                                    VirtualizingPanel.IsVirtualizing="True"
+                                    VirtualizingPanel.VirtualizationMode="Recycling"
+                                    AutoGenerateColumns="False"
+                                    GridLinesVisibility="None"
+                                    IsSynchronizedWithCurrentItem="True"
+                                    IsReadOnly="True"
+                                >
+
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu x:Name="ctxmnuScaner">
+                                        <MenuItem x:Name="ctxmnuScanerAddToHosts" Header="Добавить в хосты"/>
+                                        <Separator/>
+                                        <MenuItem x:Name="ctxmnuScanerExternalSoftware" Header="Внешние приложения"/>
+                                        <MenuItem x:Name="ctxmnuScanerCopy" Header="Копировать">
+                                            <MenuItem x:Name="ctxmnuScanerCopyBasicAttributes" Header="Основные атрибуты" ToolTip="Имя хоста, IP адрес, MAC адрес"/>
+                                        </MenuItem>
+                                        <MenuItem x:Name="ctxmnuScanerSelectAll" Header="Выделить все"/>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="⬕" Width="32">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Image Height="16" Width="16" Source="{Binding Image}" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,10,5"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTextColumn Binding="{Binding Hostname}" Header="Имя хоста"  Width="300" SortMemberPath="Hostname" CanUserSort="True">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+
+                                    <DataGridTextColumn Binding="{Binding IPAddress}" Header="IP адрес"  Width="150" SortMemberPath="IPAddress" CanUserSort="True">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+
+                                    <DataGridTemplateColumn Header="MAC адрес" Width="200" SortMemberPath="MACAddress" CanUserSort="True">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <DockPanel LastChildFill="True">
+                                                    <TextBlock Text="{Binding MACAddress}" VerticalAlignment="Center" />
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                </DataGrid.Columns>
+                            
+                            </DataGrid>
+                        </Grid>
+
+                    </DockPanel>
+                    
+                </TabItem>
+                <TabItem Header="Графики" Style="{DynamicResource TabItemVertical}">
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="560"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <DataGrid 
+                            Grid.Column="0"
+                            x:Name="dgChart"
+                            
+                            ItemsSource="{Binding Source={StaticResource ResourceKey=hosts_ro}}"
+                            IsReadOnly="True"
+                            CanUserAddRows="False"
+                            
+                            Foreground="Black"
+                            AlternationCount="2"
+                            VirtualizingPanel.IsVirtualizing="True"
+                            VirtualizingPanel.VirtualizationMode="Recycling"
+                            AutoGenerateColumns="False"
+                            GridLinesVisibility="None"
+                            IsSynchronizedWithCurrentItem="True"
+                            SelectionMode="Single"
+                        >
+
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="⬕" Width="32">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Height="16" Width="16" Source="{Binding Image}" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,10,5"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Binding="{Binding Description}" Header="Описание"  Width="150" SortMemberPath="Description" CanUserSort="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                
+                                <DataGridTextColumn Binding="{Binding Hostname}" Header="Имя хоста"  Width="200" SortMemberPath="Hostname" CanUserSort="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Binding="{Binding IPAddress}" Header="IP адрес"  Width="*" SortMemberPath="IPAddress" CanUserSort="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                            </DataGrid.Columns>
+
+                        </DataGrid>
+
+                        <GridSplitter Grid.Column="1" ResizeDirection="Columns" Width="3" Background="{DynamicResource ColorButtonBackground}" VerticalAlignment="Stretch"  HorizontalAlignment="Center" />
+
+                        <Grid x:Name="grdHistory" Grid.Column="2" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <DockPanel LastChildFill="True" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
+                                
+                                <Grid DockPanel.Dock="Top" Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="230"/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="230"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Column="1" TextAlignment="Center"><Hyperlink x:Name="hlHistory10min" >10 минут</Hyperlink></TextBlock>
+                                    <TextBlock Grid.Column="2" TextAlignment="Center"><Hyperlink x:Name="hlHistory1hour">1 час</Hyperlink></TextBlock>
+                                    <TextBlock Grid.Column="3" TextAlignment="Center"><Hyperlink x:Name="hlHistory6hour">6 часов</Hyperlink></TextBlock>
+                                    <TextBlock Grid.Column="4" TextAlignment="Center"><Hyperlink x:Name="hlHistory1day">1 день</Hyperlink></TextBlock>
+                                    <TextBlock Grid.Column="5" TextAlignment="Center"><Hyperlink x:Name="hlHistory7days">7 дней</Hyperlink></TextBlock>
+                                    <xctk:DateTimePicker x:Name="dtpHistoryFrom" Width="230" Grid.Column="0" DockPanel.Dock="Left" FormatString="dd.MM.yyyy HH:mm:ss dddd" AutoCloseCalendar="True" Format="Custom" TimeFormat="LongTime" AllowTextInput="False" TextAlignment="Left"/>
+                                    <xctk:DateTimePicker x:Name="dtpHistoryTo" Width="230" Grid.Column="6" DockPanel.Dock="Right" FormatString="dd.MM.yyyy HH:mm:ss dddd" AutoCloseCalendar="True" Format="Custom" TimeFormat="LongTime" AllowTextInput="False" TextAlignment="Left"/>
+                                </Grid>
+                                
+                                <oxy:PlotView x:Name="pvHistory" Model="{Binding ElementName=dgChart, Path=SelectedItem.HistoryModel}" Background="Transparent"/>
+                            
+                            </DockPanel>
+                            
+                            <GridSplitter Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" ResizeDirection="Rows" Height="3" Background="{DynamicResource ColorButtonBackground}" VerticalAlignment="Center"  HorizontalAlignment="Stretch" />
+
+                            <GridSplitter Grid.Column="1" Grid.Row="2" ResizeDirection="Columns" Width="3" Background="{DynamicResource ColorButtonBackground}" VerticalAlignment="Stretch"  HorizontalAlignment="Center" />
+
+                            <oxy:PlotView x:Name="pvHistoryPie" Grid.Column="0" Grid.Row="2" Model="{Binding ElementName=dgChart, Path=SelectedItem.HistoryModelPie}" Background="Transparent"/>
+
+                            <oxy:PlotView x:Name="pvHistoryBar" Grid.Column="2" Grid.Row="2" Model="{Binding ElementName=dgChart, Path=SelectedItem.HistoryModelBar}" Background="Transparent"/>
+                            
+                            <!--<DockPanel LastChildFill="True">
+                            <xctk:DateTimePicker x:Name="dtpChartFrom" Width="230" DockPanel.Dock="Left" FormatString="dd.MM.yyyy HH:mm:ss dddd" AutoCloseCalendar="True" Format="Custom" TimeFormat="LongTime" AllowTextInput="False" TextAlignment="Left" Value="{Binding ElementName=pvHistory, Path=ActualMinimum, Mode=OneWayToSource}"/>
+                            <xctk:DateTimePicker x:Name="dtpChartTo" Width="230" DockPanel.Dock="Right" FormatString="dd.MM.yyyy HH:mm:ss dddd" AutoCloseCalendar="True" Format="Custom" TimeFormat="LongTime" AllowTextInput="False" TextAlignment="Left"  Value="{Binding ElementName=pvHistory, Path=ActualMaximum, Mode=OneWayToSource}"/>
+                            --><!--<local:clsPeriodScrollBar Height="32" x:Name="psbChart"/>--><!--
+                        </DockPanel>-->
+                        </Grid>
+                        
+                    </Grid>
+
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+    </Grid>
+</Window>
