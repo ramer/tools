@@ -1,0 +1,41 @@
+﻿<Window x:Class="wndCommander"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ADViewer"
+        mc:Ignorable="d"
+        Title="ADCommander" Height="741.5" Width="1258.5" WindowState="Maximized"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}" SnapsToDevicePixels="True" Icon="img/app.ico">
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <Grid DockPanel.Dock="Bottom" Height="23" Margin="5,0,5,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="btnCommandEdit" Grid.Column="0" Content="Правка [F4]" Margin="0,0,3,0"/>
+                <Button x:Name="btnCommandCopy" Grid.Column="1" Content="Копировать [F5]" Margin="3,0,3,0"/>
+                <Button x:Name="btnCommandMove" Grid.Column="2" Content="Переместить [F6]" Margin="3,0,3,0"/>
+                <Button x:Name="btnCommandCreateContainer" Grid.Column="3" Content="Создать контейнер [F7]" Margin="3,0,3,0"/>
+                <Button x:Name="btnCommandRemove" Grid.Column="4" Content="Удалить [F8]" Margin="3,0,3,0"/>
+                <Button x:Name="btnCommandCreateObject" Grid.Column="5" Content="Создать объект [F9]" Margin="3,0,0,0"/>
+            </Grid>
+            <Grid Margin="5,5,5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" HorizontalAlignment="Center"></GridSplitter>
+                <local:ctlCommanderPanel x:Name="pnlLeft" Grid.Column="0"/>
+                <local:ctlCommanderPanel x:Name="pnlRight" Grid.Column="2"/>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</Window>

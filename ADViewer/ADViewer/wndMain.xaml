@@ -1,0 +1,145 @@
+﻿<Window x:Name="wndMain" x:Class="wndMain"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        xmlns:local="clr-namespace:ADViewer"
+        mc:Ignorable="d"
+        Title="ADViewer"
+        Icon="img/app.ico"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}" Width="1122.695" d:DesignHeight="519.33" WindowState="Maximized">
+
+    <Window.Resources>
+
+    </Window.Resources>
+
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <DockPanel DockPanel.Dock="Top" Background="{DynamicResource ColorMenuBackground}" LastChildFill="True">
+                <Button x:Name="btnWindowClone" DockPanel.Dock="Right" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,5,5,0" Content="⧉" ToolTip="Клонировать окно"></Button>
+                <Button x:Name="btnDummy" DockPanel.Dock="Right" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,5,5,0" Content="߹" ToolTip="Тестовая кнопка (не тыкать)" Visibility="Visible"/>
+                <Menu>
+                    <MenuItem x:Name="mnuFile" Header="Файл">
+                        <MenuItem x:Name="mnuFilePrint" Header="Печать"/>
+                        <Separator/>
+                        <MenuItem x:Name="mnuFileExit" Header="Выход"/>
+                    </MenuItem>
+                    <MenuItem x:Name="mnuEdit" Header="Правка">
+                        <MenuItem x:Name="mnuEditCreateObject" Header="Создание объекта"/>
+                    </MenuItem>
+                    <MenuItem x:Name="mnuService" Header="Сервис">
+                        <MenuItem x:Name="mnuServiceDomainOptions" Header="Настройки доменов"/>
+                        <MenuItem x:Name="mnuServicePreferences" Header="Настройки приложения"/>
+                        <Separator/>
+                        <MenuItem x:Name="mnuServiceDeletedObjects" Header="Восстановление удаленных объектов"/>
+                        <MenuItem x:Name="mnuServiceADCommander" Header="ADCommander"/>
+                        <Separator/>
+                        <MenuItem x:Name="mnuServiceLog" Header="Журнал"/>
+                        <MenuItem x:Name="mnuServiceError" Header="Журнал ошибок"/>
+                    </MenuItem>
+                    <MenuItem x:Name="mnuHelp" Header="Справка">
+                        <MenuItem x:Name="mnuHelpAbout" Header="О программе"/>
+                    </MenuItem>
+                </Menu>
+            </DockPanel>
+            <StatusBar Height="30" DockPanel.Dock="Bottom" >
+                <TextBlock>
+                    <Run Text="Объектов: "/>
+                    <Run Text="{Binding ElementName=dgMain, Path=Items.Count, Mode=OneWay}"/>
+                </TextBlock>
+                <TextBlock>
+                    <Run Text="Выделено: "/>
+                    <Run Text="{Binding ElementName=dgMain, Path=SelectedItems.Count, Mode=OneWay}"/>
+                </TextBlock>
+                <StatusBarItem HorizontalAlignment="Right">
+                    <StackPanel Orientation="Horizontal">
+                        <ProgressBar x:Name="pbSearch" Width="30" Height="24" Margin="0,0,2,0" IsIndeterminate="True" Visibility="Hidden"/>
+                        <Grid x:Name="grdSipStatus" >
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SipUse}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Image x:Name="imgSipStatus" Width="16" Height="16" Source="{Binding Image}" ToolTip="{Binding Status}"/>
+                        </Grid>
+                    </StackPanel>
+                </StatusBarItem>
+            </StatusBar>
+            <TextBox x:Name="tbSearchPattern" DockPanel.Dock="Bottom" Margin="5,0,5,5" Height="23" Text=""/>
+            <Grid Margin="5">
+                <local:ctlCap x:Name="cap" Panel.ZIndex="1" Visibility="Hidden"/>
+                <DataGrid 
+                Name="dgMain"
+                Foreground="Black"
+                AlternationCount="2"
+                ItemsSource="{Binding objects}"
+                VirtualizingStackPanel.IsVirtualizing="True"
+                VirtualizingStackPanel.VirtualizationMode="Recycling"
+                GridLinesVisibility="None"
+                AutoGenerateColumns="False"
+                IsSynchronizedWithCurrentItem="True"
+                IsReadOnly="True"
+            >
+                    <DataGrid.ContextMenu>
+                        <ContextMenu x:Name="ctxmnuMain">
+                            <MenuItem x:Name="ctxmnuMainExternalSoftware" Header="Внешние приложения"/>
+                            <MenuItem x:Name="ctxmnuMainCopy" Header="Копировать">
+                                <MenuItem x:Name="ctxmnuMainCopyDisplayName" Header="Отображаемое имя"/>
+                                <MenuItem x:Name="ctxmnuMainCopyBasicAttributes" Header="Основные атрибуты" ToolTip="Отображаемое имя, имя входа, основной адрес, телефон"/>
+                                <MenuItem x:Name="ctxmnuMainCopyAllAttributes" Header="Все атрибуты"/>
+                            </MenuItem>
+                            <MenuItem x:Name="ctxmnuMainSelectAll" Header="Выделить все"/>
+                            <Separator/>
+                            <MenuItem x:Name="ctxmnuMainCreateObject" Header="Создать объект..."/>
+                            <MenuItem x:Name="ctxmnuMainMove" Header="Переместить..."/>
+                            <MenuItem x:Name="ctxmnuMainRename" Header="Переименовать..."/>
+                            <MenuItem x:Name="ctxmnuMainRemove" Header="Удалить"/>
+                            <Separator/>
+                            <MenuItem x:Name="ctxmnuMainResetPassword" Header="Сбросить пароль на стандартный"/>
+                            <MenuItem x:Name="ctxmnuMainDisableEnable" Header="Заблокировать/разблокировать"/>
+                            <MenuItem x:Name="ctxmnuMainExpirationDate" Header="Установить срок действия на полночь..."/>
+                            <MenuItem x:Name="ctxmnuMainShowInCommander" Header="Показать в ADCommander">
+                                <MenuItem x:Name="ctxmnuMainShowInCommanderLeftPanel" Header="Левая панель"/>
+                                <MenuItem x:Name="ctxmnuMainShowInCommanderRightPanel" Header="Правая панель"/>
+                            </MenuItem>
+                            <MenuItem x:Name="ctxmnuProperties" Header="Свойства..." FontWeight="Bold"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+
+                    <DataGrid.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Expander IsExpanded="True">
+                                                    <Expander.Header>
+                                                        <VirtualizingStackPanel Orientation="Horizontal" Margin="10,10,0,10">
+                                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
+                                                            <TextBlock Text=" (" FontWeight="Bold" FontSize="14"/>
+                                                            <TextBlock Text="{Binding ItemCount}" FontWeight="Bold" FontSize="14"/>
+                                                            <TextBlock Text=")" FontWeight="Bold" FontSize="14"/>
+                                                        </VirtualizingStackPanel>
+                                                    </Expander.Header>
+                                                    <ItemsPresenter />
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </DataGrid.GroupStyle>
+                </DataGrid>
+            </Grid>
+        </DockPanel>
+
+    </Grid>
+</Window>

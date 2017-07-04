@@ -1,0 +1,64 @@
+﻿<Window x:Class="wndCommanderCopy"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ADViewer"
+        mc:Ignorable="d"
+        Title="Копирование" Width="541" Height="Auto" SizeToContent="Height" WindowStartupLocation="CenterOwner"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}" SnapsToDevicePixels="True" Icon="img/app.ico">
+    <Grid>
+        <local:ctlCap x:Name="cap" Panel.ZIndex="1" Visibility="Hidden"/>
+        <StackPanel Orientation="Vertical" Margin="5,5,5,7">
+            <StackPanel>
+                <TextBlock Text="Копирование объектов в"/>
+                <TextBox x:Name="tbDestination" Height="23" IsReadOnly="True"/>
+            </StackPanel>
+            <StackPanel>
+            <StackPanel Margin="0,10,0,0">
+                <RadioButton x:Name="rbCopyObjectsAndContainers" Content="Копировать объекты и структуру контейнеров" IsChecked="True" Margin="0,5,0,0"/>
+                <RadioButton x:Name="rbCopyObjects" Content="Копировать только объекты" Margin="0,5,0,0"/>
+                <RadioButton x:Name="rbCopyContainers" Content="Копировать только структуру контейнеров" Margin="0,5,0,0"/>
+            </StackPanel>
+        </StackPanel>
+            <StackPanel Margin="0,10,0,0">
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=rbCopyContainers, Path=IsChecked}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <TextBlock Text="Шаблон имен входа пользователей"/>
+                <DockPanel LastChildFill="True">
+                    <ComboBox x:Name="cmboUserPrincipalNameDomain" Width="150" Height="23" DockPanel.Dock="Right" Margin="5,0,0,0"></ComboBox>
+                    <ComboBox x:Name="cmboUserPrincipalNamePattern" Height="23" IsEditable="True"></ComboBox>
+                </DockPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=cmboUserPrincipalNamePattern, Path=Text}" Value="">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=cmboUserPrincipalNameDomain, Path=Text}" Value="">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <Image Source="img/warning.ico" Width="16" Height="16" Margin="0,0,5,0"/>
+                    <TextBlock Text="при копировании будут использованы оригинальные имена входа"/>
+                </StackPanel>
+            <CheckBox x:Name="chbAddDefaultGroups" Content="Добавить членство в стандартных группах целевого домена" IsChecked="True" Margin="0,10,0,0"/>
+        </StackPanel>
+            <StackPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
+                <Button x:Name="btnCopy" Width="150" Height="23" Content="Копировать" HorizontalAlignment="Right" IsDefault="True"></Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
